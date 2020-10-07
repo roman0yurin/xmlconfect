@@ -3,30 +3,32 @@ package com.mthaler
 import scala.xml.{ Text, Attribute, MetaData, Node, Null, Elem, TopScope }
 import scala.language.implicitConversions
 
-package object xmlconfect {
-
-  type XML = Either[TNode, MetaData]
-
-  def deserializationError(msg: String, cause: Throwable = null, fieldNames: List[String] = Nil) = throw new DeserializationException(msg, cause, fieldNames)
-  def serializationError(msg: String) = throw new SerializationException(msg)
-
-  def attribute(name: String, value: String) = Attribute(name, Text(value.toString), Null)
-  def elem(name: String, attributes: MetaData, children: Seq[Node]) = children match {
-    case elem: Elem => Elem(null, name, attributes, TopScope, true, children: _*)
-    case node: Node => Elem(null, name, attributes, TopScope, true, children: _*)
-    case x =>
-      val c = children.toArray
-      Elem(null, name, attributes, TopScope, true, c: _*)
-  }
-
-  def xmlReader[T](implicit reader: XmlReader[T]) = reader
-  def xmlWriter[T](implicit writer: XmlWriter[T]) = writer
-
-  implicit def pimpElem(elem: Elem) = new PimpedElem(elem)
-  implicit def pimpAny[T](any: T) = new PimpedAny[T](any)
-}
+package object xmlconfect extends IXmlConfectWork
 
 package xmlconfect {
+
+  trait IXmlConfectWork{
+
+    type XML = Either[TNode, MetaData]
+
+    def deserializationError(msg: String, cause: Throwable = null, fieldNames: List[String] = Nil) = throw new DeserializationException(msg, cause, fieldNames)
+    def serializationError(msg: String) = throw new SerializationException(msg)
+
+    def attribute(name: String, value: String) = Attribute(name, Text(value.toString), Null)
+    def elem(name: String, attributes: MetaData, children: Seq[Node]) = children match {
+      case elem: Elem => Elem(null, name, attributes, TopScope, true, children: _*)
+      case node: Node => Elem(null, name, attributes, TopScope, true, children: _*)
+      case x =>
+        val c = children.toArray
+        Elem(null, name, attributes, TopScope, true, c: _*)
+    }
+
+    def xmlReader[T](implicit reader: XmlReader[T]) = reader
+    def xmlWriter[T](implicit writer: XmlWriter[T]) = writer
+
+    implicit def pimpElem(elem: Node) = new PimpedElem(elem)
+    implicit def pimpAny[T](any: T) = new PimpedAny[T](any)
+  }
 
   import scala.xml.NodeSeq
 
@@ -34,7 +36,7 @@ package xmlconfect {
 
   class SerializationException(msg: String) extends RuntimeException(msg)
 
-  private[xmlconfect] class PimpedElem(elem: Elem) {
+  private[xmlconfect] class PimpedElem(elem: Node) {
 
     def convertTo[T](implicit reader: XmlElemReader[T]): T = {
       reader.read(Left(TNode.id(elem)))

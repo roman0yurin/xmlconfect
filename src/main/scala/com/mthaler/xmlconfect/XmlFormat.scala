@@ -8,7 +8,7 @@ import scala.xml.{ Text, Null, MetaData, Node }
  */
 
 @implicitNotFound(msg = "Cannot find XmlReader or XmlFormat type class for ${T}")
-trait XmlReader[T] {
+trait XmlReader[+T] {
   def read(xml: XML, name: String = ""): T
 }
 
@@ -16,7 +16,7 @@ trait XmlReader[T] {
  * Provides the XML serialization for type T.
  */
 @implicitNotFound(msg = "Cannot find XmlWriter or XmlFormat type class for ${T}")
-trait XmlWriter[T] {
+trait XmlWriter[-T] {
   def write(obj: T, name: String = ""): XML
 }
 
@@ -72,7 +72,7 @@ trait XmlElemReader[T] extends XmlReader[T] {
  * A special XmlWriter capable of writing an XML element.
  */
 @implicitNotFound(msg = "Cannot find XmlElemWriter or XmlElemFormat type class for ${T}")
-trait XmlElemWriter[T] extends XmlWriter[T] {
+trait XmlElemWriter[-T] extends XmlWriter[T] {
 
   final def write(obj: T, name: String = ""): XML = Left(writeElem0(obj, name))
 
