@@ -12,9 +12,9 @@
         <orderEntry type="library" name="bootstrap_lib" level="project"/>
         <orderEntry type="module" module-name="core_decl"/>
         <orderEntry type="library" name="core_decl_lib" level="project"/>
+        <orderEntry type="module" module-name="scala-reflect"/>
         <orderEntry type="module" module-name="shared_core"/>
         <orderEntry type="module" module-name="scala"/>
-        <orderEntry type="module" module-name="scala-reflect"/>
         <orderEntry type="module" module-name="scala-library"/>
         <orderEntry type="library" name="scala_sdk" level="project"/>
     </component>
